@@ -20,8 +20,7 @@ class _TilesViewState extends State<TilesView> {
           child: Stack(children: [
             ConstrainedBox(
                 constraints: const BoxConstraints.expand(),
-                child: const Image(
-                    image: AssetImage('assets/logoOdataFlutter.png'))),
+                child: const Image(image: AssetImage('/background.png'))),
             GridView.count(
                 crossAxisCount: 2,
                 crossAxisSpacing: 8,

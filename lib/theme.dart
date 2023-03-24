@@ -5,15 +5,30 @@ import 'package:flutter/material.dart';
 ThemeData odatafyTheme() {
   return ThemeData(
     // Colors
-    backgroundColor: const Color(0xff2C3649),
-    primaryColor: const Color(0xff2C3649),
-    primaryColorLight: const Color(0xff5cbffb),
-    highlightColor: Colors.grey[300],
-    indicatorColor: Colors.green,
+    backgroundColor: Color(0xFF001B48),
+    primaryColor: Color(0xFF018ABE),
+    primaryColorLight: Color(0xFF97CADB),
+    highlightColor: Color(0xFFD6E8EE),
+    indicatorColor: Color(0xFFF19D1A),
+
+    /*
+    backgroundColor: Color.fromARGB(255, 27, 42, 49),
+    primaryColor: Color.fromARGB(176, 32, 60, 71),
+    primaryColorLight: Color.fromARGB(255, 40, 91, 95),
+    highlightColor: Color.fromARGB(255, 115, 171, 172),
+    indicatorColor: Color.fromARGB(255, 241, 157, 26),
+*/
+/*
+ backgroundColor: Color.fromARGB(255, 14, 35, 28),
+    primaryColor: Color.fromARGB(176, 35, 90, 79),
+    primaryColorLight: Color.fromARGB(255, 76, 140, 125),
+    highlightColor: Color.fromARGB(255, 137, 171, 177),
+    indicatorColor: Color.fromARGB(255, 241, 157, 26), 
+    */
 
     // Icons
     iconTheme: const IconThemeData(
-      color: Color(0xff003050),
+      color: Color.fromARGB(255, 27, 42, 49),
     ),
 
     // Text Theme:
