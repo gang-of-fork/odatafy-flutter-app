@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_template/theme.dart';
-import 'package:flutter_template/tiles/tilesView.dart';
+import 'package:flutter_template/home/tilesView.dart';
 
 import 'appBar.dart';
 import 'data/httpHelper.dart';
@@ -54,8 +54,7 @@ class _MyHomePageState extends State<MyHomePage> {
         body: fetching
             ? ConstrainedBox(
                 constraints: const BoxConstraints.expand(),
-                child: const Image(
-                    image: AssetImage('assets/logoOdataFlutter.png')))
+                child: const Image(image: AssetImage('assets/background.png')))
             : TilesView(
                 tiles:
                     tiles) // This trailing comma makes auto-formatting nicer for build methods.
@@ -64,8 +63,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void getData() async {
     httpHelper = HttpHelper.HttpHelperWithoutAuthority();
-    print(httpHelper.getServiceEntryPoint());
     await httpHelper.getServiceEntryPoint().then((value) => tiles = value);
-    fetching = false;
+    setState(() {
+      fetching = false;
+    });
   }
 }

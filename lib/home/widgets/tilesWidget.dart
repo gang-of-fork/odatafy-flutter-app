@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:ui';
 
-import 'package:flutter_template/tables/tableView.dart';
+import 'package:flutter_template/table/tableView.dart';
 
 class TilesWidget extends StatefulWidget {
   const TilesWidget({super.key, required this.tile});

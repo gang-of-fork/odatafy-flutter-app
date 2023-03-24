@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_template/tiles/tilesWidget.dart';
+import 'package:flutter_template/home/widgets/tilesWidget.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 
 class TilesView extends StatefulWidget {
