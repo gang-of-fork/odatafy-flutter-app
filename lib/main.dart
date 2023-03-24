@@ -5,6 +5,7 @@ import 'package:flutter_template/theme.dart';
 import 'package:flutter_template/tiles/tilesView.dart';
 
 import 'appBar.dart';
+import 'data/httpHelper.dart';
 
 void main() {
   runApp(const MyApp());
@@ -34,27 +35,15 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  var tilesJSON = {
-    "@odata.context":
-        "https://services.odata.org/Experimental/OData/OData.svc/\$metadata",
-    "value": [
-      {"name": "Products", "kind": "EntitySet", "url": "Products"},
-      {"name": "ProductDetails", "kind": "EntitySet", "url": "ProductDetails"},
-      {"name": "Categories", "kind": "EntitySet", "url": "Categories"},
-      {"name": "Suppliers", "kind": "EntitySet", "url": "Suppliers"},
-      {"name": "Persons", "kind": "EntitySet", "url": "Persons"},
-      {"name": "PersonDetails", "kind": "EntitySet", "url": "PersonDetails"},
-      {"name": "Advertisements", "kind": "EntitySet", "url": "Advertisements"}
-    ]
-  };
+  late HttpHelper httpHelper;
 
   var tiles = [];
   bool fetching = true;
 
   @override
   void initState() {
+    getData();
     super.initState();
-    getMetadata();
   }
 
   @override
@@ -73,8 +62,10 @@ class _MyHomePageState extends State<MyHomePage> {
         );
   }
 
-  void getMetadata() {
-    tiles = tilesJSON["value"] as List;
+  void getData() async {
+    httpHelper = HttpHelper.HttpHelperWithoutAuthority();
+    print(httpHelper.getServiceEntryPoint());
+    await httpHelper.getServiceEntryPoint().then((value) => tiles = value);
     fetching = false;
   }
 }
