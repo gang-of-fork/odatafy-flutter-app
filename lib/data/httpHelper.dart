@@ -46,6 +46,6 @@ class HttpHelper {
       uri,
     );
 
-    return res.body;
+    return jsonDecode(res.body)["data"];
   }
 }

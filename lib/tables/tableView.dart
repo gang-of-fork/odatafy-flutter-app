@@ -21,6 +21,7 @@ class _TableViewState extends State<TableView> {
   late HttpHelper httpHelper;
 
   List<String> columns = [];
+  List<DataRow> rows = [];
 
   @override
   void initState() {
@@ -44,7 +45,7 @@ class _TableViewState extends State<TableView> {
                       DataColumn(
                         label: Text(column),
                       )
-                  ], rows: []),
+                  ], rows: rows),
                 )));
   }
 
@@ -55,6 +56,15 @@ class _TableViewState extends State<TableView> {
         print(key);
         columns.add(key);
       });
+    });
+    await httpHelper.getData(widget.tile["url"]).then((value) {
+      for (var row in value) {
+        var dataRow = DataRow(cells: []);
+        for (var column in columns) {
+          dataRow.cells.add(DataCell(Text(row[column].toString())));
+        }
+        rows.add(dataRow);
+      }
       setState(() {
         fetching = false;
       });
