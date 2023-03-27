@@ -31,6 +31,7 @@ class HttpHelper {
 
   getDefinitionMetadata(String path) async {
     Uri uri = Uri.https(authority, '/\$metadata');
+
     http.Response res = await http.get(
       uri,
     );
@@ -40,8 +41,15 @@ class HttpHelper {
     return jsonDecode(res.body)["definitions"][path];
   }
 
-  getData(String path) async {
-    Uri uri = Uri.https(authority, path);
+  getData(String path, String search) async {
+    Uri uri;
+    if (search == "") {
+      uri = Uri.parse('https://$authority/$path?\$top=30');
+    } else {
+      uri = Uri.parse('https://$authority/$path?\$top=30&\$search=$search');
+      print(uri.toString());
+    }
+    print(uri.toString());
     http.Response res = await http.get(
       uri,
     );

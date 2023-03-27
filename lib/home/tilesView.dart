@@ -15,13 +15,13 @@ class _TilesViewState extends State<TilesView> {
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: Theme.of(context).backgroundColor,
-        body: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Stack(children: [
-            ConstrainedBox(
-                constraints: const BoxConstraints.expand(),
-                child: const Image(image: AssetImage('/background.png'))),
-            GridView.count(
+        body: Stack(children: [
+          ConstrainedBox(
+              constraints: const BoxConstraints.expand(),
+              child: const Image(image: AssetImage('assets/background.png'))),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: GridView.count(
                 crossAxisCount: 2,
                 crossAxisSpacing: 8,
                 mainAxisSpacing: 8,
@@ -48,7 +48,7 @@ class _TilesViewState extends State<TilesView> {
                       ),
                     )*/
                 ),
-          ]),
-        ));
+          ),
+        ]));
   }
 }
