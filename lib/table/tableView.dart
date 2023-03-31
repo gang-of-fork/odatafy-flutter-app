@@ -58,6 +58,7 @@ class _TableViewState extends State<TableView> {
                       scrollDirection: Axis.vertical,
                       child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Padding(
                               padding: const EdgeInsets.fromLTRB(24.0, 0, 0, 0),
@@ -106,6 +107,7 @@ class _TableViewState extends State<TableView> {
                                               setState(() {
                                                 searchController.clear();
                                                 searchWord = "";
+                                                getContent(0, searchWord);
                                               });
                                             }))),
                                     textAlign: TextAlign.start,
@@ -169,6 +171,10 @@ class _TableViewState extends State<TableView> {
   }
 
   getContent(int page, String search) async {
+    setState(() {
+      fetchingContent = true;
+      rows = [];
+    });
     await httpHelper.getData(widget.tile["url"], search).then((value) {
       for (var row in value) {
         var dataRow = DataRow(
@@ -184,55 +190,9 @@ class _TableViewState extends State<TableView> {
           var ref = column.toString().contains("\$ref");
           var date = row[column.keys.first];
           if (date.runtimeType == List<dynamic>) {
-            date = date.map<String>((item) {
-              return item.toString();
-            }).toList();
-            var dropdownValue = date[0];
-            dropdownValues.add(dropdownValue);
-            dataRow.cells.add(DataCell(DropdownButton<String>(
-              dropdownColor: Theme.of(context).backgroundColor,
-              value: dropdownValues[dropdownValues.indexOf(dropdownValue)],
-              icon: const Icon(Icons.arrow_downward, size: 12),
-              elevation: 16,
-              onChanged: (String? newValue) {
-                // This is called when the user selects an item.
-                setState(() {
-                  dropdownValues[dropdownValues.indexOf(dropdownValue)] =
-                      newValue!;
-                });
-              },
-              items: date.map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Container(
-                        constraints: BoxConstraints(maxWidth: maxWidth),
-                        child: Text(value,
-                            overflow: TextOverflow.ellipsis,
-                            style: Theme.of(context).textTheme.bodySmall),
-                      ),
-                      ref
-                          ? IconButton(
-                              icon: const Icon(Icons.link),
-                              onPressed: () {
-                                // TODO: implement link
-                              },
-                            )
-                          : Container()
-                    ],
-                  ),
-                );
-              }).toList(),
-            )));
+            dataRow.cells.add(convertListToDropDown(date, ref));
           } else if (DateTime.tryParse(date.toString()) != null) {
-            String dateTime = DateFormat('yyyy-MM-dd – kk:mm')
-                .format(DateTime.parse(date.toString()));
-            dataRow.cells.add(DataCell(Container(
-              constraints: BoxConstraints(maxWidth: maxWidth),
-              child: Text(overflow: TextOverflow.ellipsis, dateTime),
-            )));
+            dataRow.cells.add(convertDateToString(date));
           } else {
             dataRow.cells.add(DataCell(Container(
               constraints: BoxConstraints(maxWidth: maxWidth),
@@ -249,5 +209,58 @@ class _TableViewState extends State<TableView> {
         fetchingContent = false;
       });
     });
+  }
+
+  DataCell convertListToDropDown(date, ref) {
+    date = date.map<String>((item) {
+      return item.toString();
+    }).toList();
+    var dropdownValue = date[0];
+    dropdownValues.add(dropdownValue);
+    return (DataCell(DropdownButton<String>(
+      dropdownColor: Theme.of(context).backgroundColor,
+      value: dropdownValues[dropdownValues.indexOf(dropdownValue)],
+      icon: const Icon(Icons.arrow_downward, size: 12),
+      elevation: 16,
+      onChanged: (String? newValue) {
+        // This is called when the user selects an item.
+        setState(() {
+          dropdownValues[dropdownValues.indexOf(dropdownValue)] = newValue!;
+        });
+      },
+      items: date.map<DropdownMenuItem<String>>((String value) {
+        return DropdownMenuItem<String>(
+          value: value,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                constraints: BoxConstraints(maxWidth: maxWidth),
+                child: Text(value,
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.bodySmall),
+              ),
+              ref
+                  ? IconButton(
+                      icon: const Icon(Icons.link),
+                      onPressed: () {
+                        // TODO: implement link
+                      },
+                    )
+                  : Container()
+            ],
+          ),
+        );
+      }).toList(),
+    )));
+  }
+
+  DataCell convertDateToString(date) {
+    String dateTime = DateFormat('yyyy-MM-dd – kk:mm')
+        .format(DateTime.parse(date.toString()));
+    return (DataCell(Container(
+      constraints: BoxConstraints(maxWidth: maxWidth),
+      child: Text(overflow: TextOverflow.ellipsis, dateTime),
+    )));
   }
 }
