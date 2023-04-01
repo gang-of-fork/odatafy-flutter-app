@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 
+import 'package:flutter_template/detail/lineDetailView.dart';
+
 class DetailView extends StatefulWidget {
   const DetailView({super.key, required this.data});
   final data;
@@ -13,10 +15,14 @@ class _DetailViewState extends State<DetailView> {
   Map<dynamic, TextEditingController> controllers = {};
   List<String> keys = [];
   Map<String, dynamic> valueMap = {};
+  Type doubleType = double;
+  Type intType = int;
+  Type stringType = String;
 
   @override
   void initState() {
     valueMap = widget.data;
+    print("HEEEEEEEEEEEEEEEEEEEELLLLLLO");
     print(widget.data);
 
     keys = valueMap.keys.toList();
@@ -32,7 +38,15 @@ class _DetailViewState extends State<DetailView> {
 
   @override
   Widget build(BuildContext context) {
-    bool checked = true;
+    Map<String, Type> type = {
+      "_id": String,
+      "name": String,
+      "description": String,
+      "category": String,
+      "price": double,
+      "__v": int
+    };
+
     return Scaffold(
       backgroundColor: Theme.of(context).backgroundColor,
       body: Padding(
@@ -51,61 +65,15 @@ class _DetailViewState extends State<DetailView> {
                 else
                   Column(
                     children: [
-                      TextField(
-                        onChanged: (text) {
-                          checkType(key, valueMap, controllers);
-                        },
-                        style: Theme.of(context).textTheme.titleLarge,
-                        controller: controllers[key],
-                        decoration: InputDecoration(
-                          labelStyle: Theme.of(context).textTheme.bodyLarge,
-                          labelText: key,
-                        ),
-                      ),
+                      LineDetailView(
+                          controller: controllers[key],
+                          name: key,
+                          type: type[key]),
                       const SizedBox(height: 16),
                     ],
                   ),
             ],
           )),
     );
-  }
-}
-
-checkType(String key, Map<String, dynamic> valueMap,
-    Map<dynamic, TextEditingController> controllers) {
-  print(
-      'ValueMap: ${valueMap} --- Key: ${key} --- Controllers: ${controllers} -- Controllers[Key]: ${controllers[key]}');
-  Type type = valueMap[key].runtimeType;
-
-  try {
-    // Attempt to convert the value to the specified type
-    final controller = controllers[key];
-
-    // Use Dart's built-in type conversion functions to convert the value
-    if (controller != null) {
-      if (type == int) {
-        valueMap[key] = int.tryParse(controller.text);
-      } else if (type == double) {
-        valueMap[key] = double.tryParse(controller.text);
-      } else if (type == String) {
-        valueMap[key] = controller.text;
-      } else if (type == bool) {
-        if (controller.text.toLowerCase() == 'true') {
-          valueMap[key] = true;
-        } else if (controller.text.toLowerCase() == 'false') {
-          valueMap[key] = false;
-        }
-        print('Type: $type');
-      } else {
-        print('Unsupported type: $type');
-        throw Exception('Unsupported type: $type');
-      }
-    }
-    print("Right");
-
-    // If the conversion was successful, return true
-  } catch (e) {
-    // If the conversion failed, return false
-    print("Wrong");
   }
 }
