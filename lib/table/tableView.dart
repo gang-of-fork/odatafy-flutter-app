@@ -51,7 +51,11 @@ class _TableViewState extends State<TableView> {
                         columns: [
                           for (var column in columns)
                             DataColumn(
-                              label: Text(column.keys.first),
+                              label: Text(
+                                column.keys.first,
+                                style:
+                                    Theme.of(context).textTheme.displayMedium,
+                              ),
                             )
                         ],
                         rows: rows),

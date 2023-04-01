@@ -12,7 +12,7 @@ class AppBarIcon extends StatelessWidget with PreferredSizeWidget {
       backgroundColor: Theme.of(context).primaryColor,
       centerTitle: true,
       automaticallyImplyLeading: withBackButton,
-      title: Image.asset('/mooLogo.png',
+      title: Image.asset('assets/mooLogo.png',
           fit: BoxFit.cover, height: 45, alignment: Alignment.bottomRight),
       actions: actions,
     );

@@ -98,19 +98,19 @@ ThemeData odatafyTheme() {
       displayLarge: TextStyle(
         fontSize: 22,
         fontFamily: 'Proxima Nova Bold',
-        color: Color(0xff838FA4),
+        color: Color.fromARGB(255, 13, 197, 62),
         letterSpacing: -0.5,
       ),
       displayMedium: TextStyle(
         fontSize: 16,
         fontFamily: 'Proxima Nova Bold',
-        color: Color(0xff838FA4),
+        color: Color.fromARGB(255, 13, 197, 62),
         letterSpacing: -0.5,
       ),
       displaySmall: TextStyle(
         fontSize: 14,
         fontFamily: 'Proxima Nova Bold',
-        color: Color(0xff838FA4),
+        color: Color.fromARGB(255, 13, 197, 62),
         letterSpacing: -0.5,
       ),
 
