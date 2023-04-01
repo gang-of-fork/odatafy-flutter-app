@@ -26,7 +26,7 @@ class TableView extends StatefulWidget {
 
 class _TableViewState extends State<TableView> {
   final double maxWidth = 200;
-  bool fetchingColumns = true;
+  bool fetchingColumns = false;
   bool fetchingContent = true;
   int page = 0;
 
@@ -34,7 +34,6 @@ class _TableViewState extends State<TableView> {
 
   late HttpHelper httpHelper;
 
-  List<Map<String, dynamic>> columns = [];
   List<List<DataRow>> listRows = [];
   List<DataRow> rows = [];
   List<String> dropdownValues = [];
@@ -144,9 +143,10 @@ class _TableViewState extends State<TableView> {
                                 columnSpacing: 16.0,
                                 showCheckboxColumn: false,
                                 columns: [
-                                  for (var column in columns)
+                                  for (var property
+                                      in widget.tileDefinition.properties)
                                     DataColumn(
-                                      label: Text(column.keys.first),
+                                      label: Text(property.name),
                                     )
                                 ],
                                 rows: rows),
@@ -159,22 +159,8 @@ class _TableViewState extends State<TableView> {
   }
 
   void getData() async {
-    getColumns();
-    getContent(0, "");
-  }
-
-  getColumns() async {
     httpHelper = HttpHelper.HttpHelperWithoutAuthority();
-    await httpHelper.getDefinitionMetadata(widget.tile["name"]).then((value) {
-      metadata = value;
-      value["properties"].forEach((key, propValue) {
-        Map<String, dynamic> column = {key: propValue};
-        columns.add(column);
-      });
-      setState(() {
-        fetchingColumns = false;
-      });
-    });
+    getContent(0, "");
   }
 
   getContent(int page, String search) async {
@@ -195,19 +181,33 @@ class _TableViewState extends State<TableView> {
                         properties: widget.tileDefinition.properties)),
               );
             });
-        for (var column in columns) {
-          var ref = column.toString().contains("\$ref");
-          var date = row[column.keys.first];
-          if (date.runtimeType == List<dynamic>) {
-            dataRow.cells.add(convertListToDropDown(date, ref));
-          } else if (DateTime.tryParse(date.toString()) != null) {
+        for (var property in widget.tileDefinition.properties) {
+          var date = row[property.name];
+          if (property.types.first == "array") {
+            dataRow.cells.add(convertListToDropDown(date, property.itemRef));
+          } else if (property.types.first == "date-time") {
             dataRow.cells.add(convertDateToString(date));
           } else {
             dataRow.cells.add(DataCell(Container(
               constraints: BoxConstraints(maxWidth: maxWidth),
-              child: Text(
-                overflow: TextOverflow.ellipsis,
-                date.toString(),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Text(
+                      overflow: TextOverflow.ellipsis,
+                      date.toString(),
+                    ),
+                  ),
+                  property.ref != ""
+                      ? IconButton(
+                          icon: const Icon(Icons.link),
+                          onPressed: () {
+                            // TODO: implement link
+                          },
+                        )
+                      : Container()
+                ],
               ),
             )));
           }
@@ -249,7 +249,7 @@ class _TableViewState extends State<TableView> {
                     overflow: TextOverflow.ellipsis,
                     style: Theme.of(context).textTheme.bodySmall),
               ),
-              ref
+              ref != ""
                   ? IconButton(
                       icon: const Icon(Icons.link),
                       onPressed: () {

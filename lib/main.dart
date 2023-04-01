@@ -57,11 +57,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ? ConstrainedBox(
                 constraints: const BoxConstraints.expand(),
                 child: const Image(image: AssetImage('assets/background.png')))
-            : TilesView(
-                tiles: tiles,
-                tileDefinitions: tileDefinitions,
-              ) // This trailing comma makes auto-formatting nicer for build methods.
-        );
+            : TilesView(tiles: tiles, tileDefinitions: tileDefinitions));
   }
 
   void getData() async {
@@ -70,6 +66,7 @@ class _MyHomePageState extends State<MyHomePage> {
     await httpHelper
         .getMetadataFormatted()
         .then((value) => tileDefinitions = value);
+    print(tileDefinitions.toString());
     setState(() {
       fetching = false;
     });

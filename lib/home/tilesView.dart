@@ -41,7 +41,10 @@ class _TilesViewState extends State<TilesView> {
                           child: FadeInAnimation(
                               child: TilesWidget(
                             tile: widget.tiles[index],
-                            tileDefinition: widget.tileDefinitions[index],
+                            tileDefinition: widget.tileDefinitions.firstWhere(
+                                (element) =>
+                                    element.name ==
+                                    widget.tiles[index]["name"]),
                           ))));
                 })),
           ),
