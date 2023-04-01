@@ -6,6 +6,7 @@ import 'package:flutter_template/home/tilesView.dart';
 
 import 'appBar.dart';
 import 'data/httpHelper.dart';
+import 'data/tile.dart';
 
 void main() {
   runApp(const MyApp());
@@ -38,6 +39,7 @@ class _MyHomePageState extends State<MyHomePage> {
   late HttpHelper httpHelper;
 
   var tiles = [];
+  List<Tile> tileDefinitions = [];
   bool fetching = true;
 
   @override
@@ -56,14 +58,18 @@ class _MyHomePageState extends State<MyHomePage> {
                 constraints: const BoxConstraints.expand(),
                 child: const Image(image: AssetImage('assets/background.png')))
             : TilesView(
-                tiles:
-                    tiles) // This trailing comma makes auto-formatting nicer for build methods.
+                tiles: tiles,
+                tileDefinitions: tileDefinitions,
+              ) // This trailing comma makes auto-formatting nicer for build methods.
         );
   }
 
   void getData() async {
     httpHelper = HttpHelper.HttpHelperWithoutAuthority();
     await httpHelper.getServiceEntryPoint().then((value) => tiles = value);
+    await httpHelper
+        .getMetadataFormatted()
+        .then((value) => tileDefinitions = value);
     setState(() {
       fetching = false;
     });

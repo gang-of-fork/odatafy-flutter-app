@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter_template/data/tile.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -27,6 +28,28 @@ class HttpHelper {
     );
 
     return jsonDecode(res.body);
+  }
+
+  Future<List<Tile>> getMetadataFormatted() async {
+    Uri uri = Uri.https(authority, '/\$metadata');
+    http.Response res = await http.get(
+      uri,
+    );
+
+    List<Tile> tiles = [];
+
+    jsonDecode(res.body)["definitions"]?.keys.forEach((key) {
+          var json = '{"' +
+              key +
+              '":' +
+              jsonEncode(jsonDecode(res.body)["definitions"][key]) +
+              "}";
+
+          tiles.add(Tile.fromJSON(jsonDecode(json)));
+        }) ??
+        [];
+
+    return tiles;
   }
 
   getDefinitionMetadata(String path) async {

@@ -4,10 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_template/home/widgets/tilesWidget.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import '../data/property.dart';
+import '../data/tile.dart';
 
 class TilesView extends StatefulWidget {
-  const TilesView({super.key, required this.tiles});
+  const TilesView(
+      {super.key, required this.tiles, required this.tileDefinitions});
   final tiles;
+  final List<Tile> tileDefinitions;
 
   @override
   State<TilesView> createState() => _TilesViewState();
@@ -36,7 +39,10 @@ class _TilesViewState extends State<TilesView> {
                       child: ScaleAnimation(
                           scale: 0.5,
                           child: FadeInAnimation(
-                              child: TilesWidget(tile: widget.tiles[index]))));
+                              child: TilesWidget(
+                            tile: widget.tiles[index],
+                            tileDefinition: widget.tileDefinitions[index],
+                          ))));
                 })),
           ),
         ]));

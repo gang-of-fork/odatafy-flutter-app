@@ -20,14 +20,7 @@ class Tile {
           '":' +
           jsonEncode(importMap[name]["properties"][value]) +
           "}";
-      print(json);
       properties.add(Property.fromJSON(jsonDecode(json)));
     });
-    /*properties = castedProperties.map((value) {
-          print("{$value}");
-          return Property.fromJSON(
-              jsonDecode(value.toString()).cast<Map<String, dynamic>>());
-        }).toList() ??
-        [];*/
   }
 }

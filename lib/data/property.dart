@@ -9,7 +9,6 @@ class Property {
       this.itemTypes, this.itemRef);
 
   Property.fromJSON(Map<String, dynamic> importMap) {
-    print(importMap.toString());
     name = importMap.keys.first;
     types = importMap[name]["anyOf"]
             ?.map((value) {

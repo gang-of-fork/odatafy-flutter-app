@@ -3,9 +3,12 @@ import 'dart:convert';
 
 import 'package:flutter_template/detail/lineDetailView.dart';
 
+import '../data/property.dart';
+
 class DetailView extends StatefulWidget {
-  const DetailView({super.key, required this.data});
+  const DetailView({super.key, required this.data, required this.properties});
   final data;
+  final List<Property> properties;
 
   @override
   State<DetailView> createState() => _DetailViewState();

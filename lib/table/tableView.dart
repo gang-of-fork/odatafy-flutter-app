@@ -8,11 +8,17 @@ import 'package:collection/collection.dart';
 import 'package:badges/badges.dart' as Badges;
 
 import '../data/httpHelper.dart';
+import '../data/tile.dart';
 
 class TableView extends StatefulWidget {
-  TableView({super.key, required this.tile, this.filter = const []});
+  TableView(
+      {super.key,
+      required this.tile,
+      this.filter = const [],
+      required this.tileDefinition});
   final tile;
   final filter;
+  final Tile tileDefinition;
 
   @override
   State<TableView> createState() => _TableViewState();
@@ -184,7 +190,9 @@ class _TableViewState extends State<TableView> {
               await Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (BuildContext context) => DetailView(data: row)),
+                    builder: (BuildContext context) => DetailView(
+                        data: row,
+                        properties: widget.tileDefinition.properties)),
               );
             });
         for (var column in columns) {

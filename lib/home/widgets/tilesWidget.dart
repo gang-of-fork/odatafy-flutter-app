@@ -3,9 +3,13 @@ import 'dart:ui';
 
 import 'package:flutter_template/table/tableView.dart';
 
+import '../../data/tile.dart';
+
 class TilesWidget extends StatefulWidget {
-  const TilesWidget({super.key, required this.tile});
+  const TilesWidget(
+      {super.key, required this.tile, required this.tileDefinition});
   final tile;
+  final Tile tileDefinition;
 
   @override
   State<TilesWidget> createState() => _TilesWidgetState();
@@ -19,7 +23,8 @@ class _TilesWidgetState extends State<TilesWidget> {
         await Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => TableView(tile: widget.tile),
+              builder: (context) => TableView(
+                  tile: widget.tile, tileDefinition: widget.tileDefinition),
             ));
       },
       child: ClipRRect(
