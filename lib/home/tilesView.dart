@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_template/home/widgets/tilesWidget.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import '../data/property.dart';
 
 class TilesView extends StatefulWidget {
   const TilesView({super.key, required this.tiles});
@@ -34,20 +37,7 @@ class _TilesViewState extends State<TilesView> {
                           scale: 0.5,
                           child: FadeInAnimation(
                               child: TilesWidget(tile: widget.tiles[index]))));
-                })
-                /*for (var tile in widget.tiles)
-                    AnimationConfiguration.staggeredGrid(
-                      position: widget.tiles.indexOf(tile),
-                      duration: const Duration(milliseconds: 1000),
-                      columnCount: 3,
-                      child: SlideAnimation(
-                        horizontalOffset: 50.0,
-                        child: FadeInAnimation(
-                          child: TilesWidget(tile: tile),
-                        ),
-                      ),
-                    )*/
-                ),
+                })),
           ),
         ]));
   }
