@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:flutter_template/data/type.dart';
+
 import '../data/property.dart';
 import 'package:test/test.dart';
 
@@ -97,6 +99,11 @@ void main() {
       expect(property.pattern, "");
       expect(property.itemTypes, ["decimal", "double", "int64"]);
       expect(property.itemRef, "");
+      expect(property.typeArray.itemTypes, [
+        Type(["string", "number"], "decimal"),
+        Type(["number", "string"], "double"),
+        Type(["integer", "integer"], "int64")
+      ]);
     });
 
     test('Property with maxLength and pattern', () {

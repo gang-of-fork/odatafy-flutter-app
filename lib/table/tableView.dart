@@ -9,6 +9,7 @@ import 'package:badges/badges.dart' as Badges;
 
 import '../data/httpHelper.dart';
 import '../data/tile.dart';
+import 'filterView.dart';
 
 class TableView extends StatefulWidget {
   TableView(
@@ -37,7 +38,7 @@ class _TableViewState extends State<TableView> {
   List<List<DataRow>> listRows = [];
   List<DataRow> rows = [];
   List<String> dropdownValues = [];
-  List filter = [];
+  List<String> filter = [];
 
   late dynamic metadata;
 
@@ -134,7 +135,22 @@ class _TableViewState extends State<TableView> {
                                           .labelSmall),
                                   child: IconButton(
                                       color: Colors.white,
-                                      onPressed: () {},
+                                      onPressed: () async {
+                                        await Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    FilterView(
+                                                      tile: widget.tile,
+                                                      tileDefinition:
+                                                          widget.tileDefinition,
+                                                      filter: filter,
+                                                    ))).then((value) {
+                                          setState(() {
+                                            filter = value;
+                                          });
+                                        });
+                                      },
                                       icon: const Icon(Icons.filter_alt)),
                                 )
                               ]),

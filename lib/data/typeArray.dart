@@ -1,3 +1,5 @@
+import 'package:flutter_template/data/type.dart';
+
 class TypeArray {
   late String itemRef;
   late List<dynamic> itemTypes;
@@ -7,15 +9,13 @@ class TypeArray {
   TypeArray(this.itemTypes, this.itemRef, this.typeArray);
 
   TypeArray.fromJSON(Map<String, dynamic> importMap) {
-    itemTypes = importMap["items"]?["anyOf"]
-            ?.map((value) {
-              var test = value["format"].toString();
-              return test;
-            })
+    itemTypes = [];
+    importMap["items"]["anyOf"] != null
+        ? itemTypes = importMap["items"]["anyOf"]
+            .map((value) => Type.fromJSON(value))
             .toList()
-            .toSet()
-            .toList() ??
-        [];
+        : itemTypes.add(Type.fromJSON(importMap["items"]));
+
     itemRef = importMap["items"]?["anyOf"]
             ?.map((value) {
               var test = value["\$ref"].toString();
