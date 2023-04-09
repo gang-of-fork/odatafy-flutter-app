@@ -18,9 +18,9 @@ class Property {
     typesClass = [];
     importMap[name]["anyOf"] != null
         ? typesClass = importMap[name]["anyOf"]
-            .map((value) => Type.fromJSON(value))
+            .map((value) => TypeFormat.fromJSON(value))
             .toList()
-        : typesClass.add(Type.fromJSON(importMap[name]));
+        : typesClass.add(TypeFormat.fromJSON(importMap[name]));
     types = importMap[name]["anyOf"]
             ?.map((value) {
               var test = value["format"].toString();

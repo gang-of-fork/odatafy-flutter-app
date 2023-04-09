@@ -100,9 +100,9 @@ void main() {
       expect(property.itemTypes, ["decimal", "double", "int64"]);
       expect(property.itemRef, "");
       expect(property.typeArray.itemTypes, [
-        Type(["string", "number"], "decimal"),
-        Type(["number", "string"], "double"),
-        Type(["integer", "integer"], "int64")
+        TypeFormat(["string", "number"], "decimal"),
+        TypeFormat(["number", "string"], "double"),
+        TypeFormat(["integer", "integer"], "int64")
       ]);
     });
 

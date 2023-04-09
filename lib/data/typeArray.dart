@@ -12,9 +12,9 @@ class TypeArray {
     itemTypes = [];
     importMap["items"]["anyOf"] != null
         ? itemTypes = importMap["items"]["anyOf"]
-            .map((value) => Type.fromJSON(value))
+            .map((value) => TypeFormat.fromJSON(value))
             .toList()
-        : itemTypes.add(Type.fromJSON(importMap["items"]));
+        : itemTypes.add(TypeFormat.fromJSON(importMap["items"]));
 
     itemRef = importMap["items"]?["anyOf"]
             ?.map((value) {

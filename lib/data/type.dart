@@ -1,13 +1,13 @@
 import 'package:collection/collection.dart';
 
-class Type {
+class TypeFormat {
   late List<dynamic> types;
   late String format;
   // List<String> failes at casting type but types is List<String>
 
-  Type(this.types, this.format);
+  TypeFormat(this.types, this.format);
 
-  Type.fromJSON(Map<String, dynamic> importMap) {
+  TypeFormat.fromJSON(Map<String, dynamic> importMap) {
     types = [];
     importMap["type"]?.runtimeType == List
         ? types = importMap["type"]?.map((value) {
@@ -20,7 +20,7 @@ class Type {
   @override
   bool operator ==(Object other) {
     Function eq = const DeepCollectionEquality().equals;
-    if (other is Type) {
+    if (other is TypeFormat) {
       print(format);
       print(other.format);
       print(types.toString());
@@ -29,7 +29,7 @@ class Type {
       print(format == other.format);
     }
     return identical(this, other) ||
-        other is Type &&
+        other is TypeFormat &&
             runtimeType == other.runtimeType &&
             eq(types, other.types) &&
             format == other.format;
