@@ -30,7 +30,6 @@ class Property {
             .toSet()
             .toList() ??
         [];
-    var format = importMap[name]["name"];
     var type = importMap[name]["type"];
     if (type != null) {
       types.add(type.toString());

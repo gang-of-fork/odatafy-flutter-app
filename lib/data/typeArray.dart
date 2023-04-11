@@ -4,6 +4,7 @@ class TypeArray {
   late String itemRef;
   late List<dynamic> itemTypes;
   late TypeArray? typeArray;
+  // max length, pattern,
   // List<String> failes at casting type but types is List<String>
 
   TypeArray(this.itemTypes, this.itemRef, this.typeArray);
@@ -24,7 +25,7 @@ class TypeArray {
             .toList()
             .firstWhere((element) => element != "null", orElse: () => "") ??
         "";
-    typeArray = itemTypes.first == "array"
+    typeArray = itemTypes.first.types.first.contains("array")
         ? TypeArray.fromJSON(importMap["items"]["anyOf"]["items"])
         : null;
   }
