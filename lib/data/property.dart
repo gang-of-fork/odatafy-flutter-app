@@ -8,10 +8,11 @@ class Property {
   late int maxLength;
   late List<dynamic> itemTypes;
   late TypeArray typeArray;
+  late List<dynamic> keys;
   // List<String> failes at casting type but types is List<String>
 
   Property(this.name, this.types, this.ref, this.maxLength, this.pattern,
-      this.typesClass, this.itemTypes, this.itemRef, this.typeArray);
+      this.typesClass, this.itemTypes, this.itemRef, this.typeArray, this.keys);
 
   Property.fromJSON(Map<String, dynamic> importMap) {
     name = importMap.keys.first;
@@ -21,6 +22,7 @@ class Property {
             .map((value) => TypeFormat.fromJSON(value))
             .toList()
         : typesClass.add(TypeFormat.fromJSON(importMap[name]));
+    keys = importMap[name]["keys"] ?? [];
     types = importMap[name]["anyOf"]
             ?.map((value) {
               var test = value["format"].toString();

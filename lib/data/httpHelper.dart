@@ -64,19 +64,48 @@ class HttpHelper {
     return jsonDecode(res.body)["definitions"][path];
   }
 
-  getData(String path, String search) async {
+  getData(String path, String search, List filter) async {
     Uri uri;
+    String filterString = "";
+    if (filter.isNotEmpty) {
+      filterString = "\$filter=";
+      var counter = 0;
+      for (var expr in filter) {
+        counter = counter + 1;
+        if (counter != filter.length) {
+          filterString +=
+              "${expr.toString().replaceFirst("=", "eq").replaceFirst("≠", "ne").replaceFirst("<", "lt").replaceFirst(">", "gt").replaceFirst("≤", "le").replaceFirst("≥", "ge")} and ";
+        } else {
+          filterString += expr
+              .toString()
+              .replaceFirst("=", "eq")
+              .replaceFirst("≠", "ne")
+              .replaceFirst("<", "lt")
+              .replaceFirst(">", "gt")
+              .replaceFirst("≤", "le")
+              .replaceFirst("≥", "ge");
+        }
+      }
+    }
+
     if (search == "") {
-      uri = Uri.parse('https://$authority/$path?\$top=30');
+      String searchParse = 'https://$authority/$path?';
+      if (filterString != "") {
+        searchParse += filterString;
+      }
+      uri = Uri.parse(searchParse);
     } else {
-      uri = Uri.parse('https://$authority/$path?\$top=30&\$search=$search');
-      print(uri.toString());
+      String searchParse = 'https://$authority/$path?\$search=$search';
+      if (filterString != "") {
+        searchParse += "&" + filterString;
+      }
+      uri = Uri.parse(searchParse);
     }
     print(uri.toString());
     http.Response res = await http.get(
       uri,
     );
 
-    return jsonDecode(res.body)["data"] as List;
+    return (jsonDecode(res.body)["data"] ?? []) as List;
   }
 }
