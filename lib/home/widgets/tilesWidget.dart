@@ -7,9 +7,15 @@ import '../../data/tile.dart';
 
 class TilesWidget extends StatefulWidget {
   const TilesWidget(
-      {super.key, required this.tile, required this.tileDefinition});
+      {super.key,
+      required this.tile,
+      required this.tiles,
+      required this.tileDefinition,
+      required this.tileDefinitions});
   final tile;
+  final tiles;
   final Tile tileDefinition;
+  final List<Tile> tileDefinitions;
 
   @override
   State<TilesWidget> createState() => _TilesWidgetState();
@@ -24,7 +30,10 @@ class _TilesWidgetState extends State<TilesWidget> {
             context,
             MaterialPageRoute(
               builder: (context) => TableView(
-                  tile: widget.tile, tileDefinition: widget.tileDefinition),
+                  tile: widget.tile,
+                  tileDefinition: widget.tileDefinition,
+                  tileDefinitions: widget.tileDefinitions,
+                  tiles: widget.tiles),
             ));
       },
       child: ClipRRect(

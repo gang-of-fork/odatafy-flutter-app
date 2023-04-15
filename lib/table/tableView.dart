@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'package:flutter_template/data/property.dart';
+import 'package:flutter_template/home/tilesView.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_template/appBar.dart';
@@ -16,9 +18,13 @@ class TableView extends StatefulWidget {
       {super.key,
       required this.tile,
       this.filter = const [],
-      required this.tileDefinition});
+      required this.tiles,
+      required this.tileDefinition,
+      required this.tileDefinitions});
   final tile;
-  final filter;
+  final tiles;
+  final List<String> filter;
+  final List<Tile> tileDefinitions;
   final Tile tileDefinition;
 
   @override
@@ -45,6 +51,7 @@ class _TableViewState extends State<TableView> {
   @override
   void initState() {
     super.initState();
+    filter = widget.filter;
     getData();
   }
 
@@ -148,6 +155,7 @@ class _TableViewState extends State<TableView> {
                                                     ))).then((value) {
                                           setState(() {
                                             filter = value;
+                                            getContent(0, "");
                                           });
                                         });
                                       },
@@ -184,7 +192,7 @@ class _TableViewState extends State<TableView> {
       fetchingContent = true;
       rows = [];
     });
-    await httpHelper.getData(widget.tile["url"], search).then((value) {
+    await httpHelper.getData(widget.tile["url"], search, filter).then((value) {
       for (var row in value) {
         var dataRow = DataRow(
             cells: [],
@@ -219,7 +227,7 @@ class _TableViewState extends State<TableView> {
                       ? IconButton(
                           icon: const Icon(Icons.link),
                           onPressed: () {
-                            // TODO: implement link
+                            navigateToRefTable(property.ref, date.toString());
                           },
                         )
                       : Container()
@@ -269,7 +277,7 @@ class _TableViewState extends State<TableView> {
                   ? IconButton(
                       icon: const Icon(Icons.link),
                       onPressed: () {
-                        // TODO: implement link
+                        navigateToRefTable(ref, value.toString());
                       },
                     )
                   : Container()
@@ -287,5 +295,49 @@ class _TableViewState extends State<TableView> {
       constraints: BoxConstraints(maxWidth: maxWidth),
       child: Text(overflow: TextOverflow.ellipsis, dateTime),
     )));
+  }
+
+  void navigateToRefTable(String ref, String id) {
+    String tileName = ref.split("/").last;
+    var refTile;
+    filter = [];
+    var tileDefinition;
+    for (var tileObj in widget.tiles) {
+      if (tileObj["name"] == tileName) {
+        refTile = tileObj;
+      }
+    }
+    for (var definition in widget.tileDefinitions) {
+      if (definition.name == tileName) {
+        tileDefinition = definition;
+        var property;
+        print(definition.properties.length);
+        definition.properties.forEach((prop) {
+          print("test");
+          print(prop);
+          if (prop.name == definition.keys.first) {
+            property = prop;
+          }
+        });
+        var formattedId = "'$id'";
+        print(property);
+        if (property != null && property.pattern == "^[0-9a-fA-F]{24}\$") {
+          formattedId = "cast('$id',ObjectId)";
+        }
+        filter.add("${definition.keys.first} = ${formattedId}");
+        print(filter.first);
+      }
+    }
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (BuildContext context) => TableView(
+              tile: refTile,
+              tileDefinition: tileDefinition,
+              tileDefinitions: widget.tileDefinitions,
+              tiles: widget.tiles,
+              filter: filter)),
+    );
   }
 }

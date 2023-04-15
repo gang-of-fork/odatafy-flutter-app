@@ -33,19 +33,21 @@ class _TilesViewState extends State<TilesView> {
                 mainAxisSpacing: 8,
                 children: List.generate(widget.tiles.length, (int index) {
                   return AnimationConfiguration.staggeredGrid(
-                      columnCount: 2,
-                      position: index,
-                      duration: const Duration(milliseconds: 1000),
-                      child: ScaleAnimation(
-                          scale: 0.5,
-                          child: FadeInAnimation(
-                              child: TilesWidget(
-                            tile: widget.tiles[index],
-                            tileDefinition: widget.tileDefinitions.firstWhere(
-                                (element) =>
-                                    element.name ==
-                                    widget.tiles[index]["name"]),
-                          ))));
+                    columnCount: 2,
+                    position: index,
+                    duration: const Duration(milliseconds: 1000),
+                    child: ScaleAnimation(
+                        scale: 0.5,
+                        child: FadeInAnimation(
+                            child: TilesWidget(
+                          tiles: widget.tiles,
+                          tile: widget.tiles[index],
+                          tileDefinition: widget.tileDefinitions.firstWhere(
+                              (element) =>
+                                  element.name == widget.tiles[index]["name"]),
+                          tileDefinitions: widget.tileDefinitions,
+                        ))),
+                  );
                 })),
           ),
         ]));
