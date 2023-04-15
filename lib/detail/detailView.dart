@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 
 import 'package:flutter_template/detail/lineDetailView.dart';
+import 'package:flutter_template/data/httpHelper.dart';
 
 import '../data/property.dart';
 
@@ -15,11 +16,11 @@ class DetailView extends StatefulWidget {
 }
 
 class _DetailViewState extends State<DetailView> {
+  late HttpHelper httpHelper;
   Map<dynamic, TextEditingController> controllers = {};
   List<String> keys = [];
   List<Property> propertiesList = [];
   late Map<String, dynamic> valueMap = {};
-  late List<Type> typesList = [];
   late Map<String, Type> typesMap = {};
   late Map<String, String> patternMap = {};
   late Map<String, int> maxLengthMap = {};
@@ -28,7 +29,13 @@ class _DetailViewState extends State<DetailView> {
   @override
   void initState() {
     valueMap = widget.data;
+    print(widget.data['products'].runtimeType);
     propertiesList = widget.properties;
+
+    print(valueMap['products'].runtimeType);
+    print(valueMap['products'][0]);
+
+    print(propertiesList[0].name);
 
     keys = valueMap.keys.toList();
 
@@ -94,51 +101,10 @@ class _DetailViewState extends State<DetailView> {
           );
   }
 
-  Type getTypeFromFormatType(String formatString, String typeString) {
-    switch (formatString) {
-      case 'string':
-        return String;
-      case 'decimal':
-        return String;
-      case 'double':
-        return String;
-      case 'int64':
-        return int;
-      default:
-        return getTypeFromTypeString(typeString);
-      //throw ArgumentError('Invalid type: $typeString');
-    }
-  }
-
-  Type getTypeFromTypeString(String typeString) {
-    switch (typeString) {
-      case 'string':
-        return String;
-      case 'null':
-        return String;
-      case '':
-        return String;
-      case 'integer':
-        return int;
-      case 'int64':
-        return int;
-      case 'decimal':
-        return double;
-      case 'bool':
-        return bool;
-      case 'date-time':
-        return DateTime;
-      default:
-        return String;
-      //throw ArgumentError('Invalid type: $typeString');
-    }
-  }
-
   getPropertiesType(List<Property> propertiesList) {
     Map<String, Type> dataTypeMap = {};
     List<Type> dataTypeList = [];
     propertiesList.forEach((property) {
-      print("test");
       DataTypeEnum resultDataType = DataTypeEnum.noType;
       property.typesClass.forEach((typesClass) {
         resultDataType = getMoreRestrictiveType(
@@ -157,7 +123,6 @@ class _DetailViewState extends State<DetailView> {
 
     setState(() {
       fetching = false;
-      typesList = dataTypeList;
       typesMap = dataTypeMap;
     });
   }
@@ -171,10 +136,7 @@ class _DetailViewState extends State<DetailView> {
   }
 
   DataTypeEnum transformFormatToDataType(String format) {
-    print('FOOOOOOOOOOOORMAT: ${format}');
     switch (format) {
-      case 'date':
-        return DataTypeEnum.dateType;
       case 'date-time':
         return DataTypeEnum.datetimeType;
       case 'double':
@@ -191,7 +153,6 @@ class _DetailViewState extends State<DetailView> {
   DataTypeEnum transformTypesListToDataType(List<dynamic> types) {
     DataTypeEnum localResultDataType = DataTypeEnum.noType;
     types.forEach((type) {
-      print('TYYYYYYYYYYPE: ${type}');
       switch (type) {
         case 'boolean':
           localResultDataType = getMoreRestrictiveType(
@@ -237,8 +198,6 @@ class _DetailViewState extends State<DetailView> {
         return double;
       case DataTypeEnum.datetimeType:
         return DateTime;
-      case DataTypeEnum.dateType:
-      //TODO: Date?
       case DataTypeEnum.booleanType:
         return bool;
       case DataTypeEnum.array:
@@ -279,30 +238,66 @@ class _DetailViewState extends State<DetailView> {
       Map<String, String> patternMap,
       Map<String, int> maxLengthMap) {
     bool noProblems = true;
+    String snackBarText = "";
     controllers.forEach((key, controller) {
       switch (typesMap[key]) {
         case int:
           if (!isInputValidInt(controller.text, maxLengthMap[key])) {
+            if (maxLengthMap[key] != null) {
+              snackBarText =
+                  'In the field ${key} is an error. Input should be of type: ${typesMap[key]} and with a maximum length of ${maxLengthMap[key]}.';
+            } else {
+              snackBarText =
+                  'In the field ${key} is an error. Input should be of type: ${typesMap[key]}.';
+            }
             noProblems = false;
           }
           break;
         case double:
           if (!isInputValidDouble(controller.text, maxLengthMap[key])) {
+            if (maxLengthMap[key] != null) {
+              snackBarText =
+                  'In the field ${key} is an error. Input should be of type: ${typesMap[key]} and with a maximum length of ${maxLengthMap[key]}.';
+            } else {
+              snackBarText =
+                  'In the field ${key} is an error. Input should be of type: ${typesMap[key]}.';
+            }
             noProblems = false;
           }
           break;
         case String:
           if (!isInputValidString(controller.text, maxLengthMap[key])) {
+            if (maxLengthMap[key] != null) {
+              snackBarText =
+                  'In the field ${key} is an error. Input should be of type: ${typesMap[key]} and with a maximum length of ${maxLengthMap[key]}.';
+            } else {
+              snackBarText =
+                  'In the field ${key} is an error. Input should be of type: ${typesMap[key]}.';
+            }
             noProblems = false;
           }
           break;
         case DateTime:
           if (!isInputValidDateTime(controller.text, maxLengthMap[key])) {
+            if (maxLengthMap[key] != null) {
+              snackBarText =
+                  'In the field ${key} is an error. Input should be of type: ${typesMap[key]} and with a maximum length of ${maxLengthMap[key]}.';
+            } else {
+              snackBarText =
+                  'In the field ${key} is an error. Input should be of type: ${typesMap[key]}.';
+            }
             noProblems = false;
           }
           break;
         case bool:
           if (!isInputValidBoolean(controller.text, maxLengthMap[key])) {
+            if (maxLengthMap[key] != null) {
+              snackBarText =
+                  'In the field ${key} is an error. Input should be of type: ${typesMap[key]} and with a maximum length of ${maxLengthMap[key]}.';
+            } else {
+              snackBarText =
+                  'In the field ${key} is an error. Input should be of type: ${typesMap[key]}.';
+            }
             noProblems = false;
           }
           break;
@@ -311,7 +306,7 @@ class _DetailViewState extends State<DetailView> {
     if (noProblems) {
       sendData(controllers);
     } else {
-      showInSnackbar(context, "Input is not valid.");
+      showInSnackbar(context, snackBarText);
     }
   }
 
@@ -351,11 +346,43 @@ class _DetailViewState extends State<DetailView> {
             (input.toLowerCase() == 'true' || input.toLowerCase() == 'false');
   }
 
+  dynamic convertToType(Type? type, dynamic value) {
+    switch (type) {
+      case String:
+        return value.toString();
+      case int:
+        return int.parse(value.toString());
+      case double:
+        return double.parse(value.toString());
+      case DateTime:
+        return DateTime.parse(value.toString());
+      case bool:
+        return (value.toString().toLowerCase() == 'true');
+      case Array:
+        for (var item in value) {
+          print('Arrraaaaaaaayyyyy: ${item}');
+        }
+
+        return null;
+      /*
+        List<dynamic> convertedList = [];
+        for (var item in value) {
+          convertedList.add(convertToType(item.runtimeType, item));
+        }
+        return convertedList; */
+      default:
+        return value;
+    }
+  }
+
   sendData(Map<dynamic, TextEditingController> controllers) {
     //TODO: Write method, that sends updated data to backend and gives message to user
-    controllers.forEach((key, controller) {
-      print(controller.text);
+    httpHelper = HttpHelper.HttpHelperWithoutAuthority();
+    valueMap.forEach((key, value) {
+      valueMap[key] = convertToType(typesMap[key], controllers[key]?.text);
     });
+
+    httpHelper.updateCategory(valueMap['_id'], valueMap);
   }
 }
 
@@ -365,7 +392,6 @@ enum DataTypeEnum {
   integerType,
   doubleType,
   datetimeType,
-  dateType,
   booleanType,
   array
 }

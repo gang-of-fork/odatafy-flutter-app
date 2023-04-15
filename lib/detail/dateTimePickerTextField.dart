@@ -2,16 +2,25 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class DateTimePickerTextField extends StatefulWidget {
-  const DateTimePickerTextField({Key? key}) : super(key: key);
+  const DateTimePickerTextField({Key? key, required this.initialDateTime})
+      : super(key: key);
+  final DateTime initialDateTime;
 
   @override
   _DateTimePickerTextFieldState createState() =>
-      _DateTimePickerTextFieldState();
+      _DateTimePickerTextFieldState(initialDateTime);
 }
 
 class _DateTimePickerTextFieldState extends State<DateTimePickerTextField> {
   DateTime? selectedDate;
   TimeOfDay? selectedTime;
+
+  _DateTimePickerTextFieldState(DateTime? initialDateTime) {
+    if (initialDateTime != null) {
+      selectedDate = initialDateTime;
+      selectedTime = TimeOfDay.fromDateTime(initialDateTime);
+    }
+  }
 
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? pickedDate = await showDatePicker(
@@ -42,8 +51,9 @@ class _DateTimePickerTextFieldState extends State<DateTimePickerTextField> {
   Widget build(BuildContext context) {
     return TextField(
       readOnly: true,
-      decoration: const InputDecoration(
+      decoration: InputDecoration(
         hintText: 'Select date and time',
+        hintStyle: Theme.of(context).textTheme.bodySmall,
       ),
       onTap: () async {
         await _selectDate(context);

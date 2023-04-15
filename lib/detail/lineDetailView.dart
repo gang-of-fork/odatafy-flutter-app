@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
-
+import 'package:flutter_template/detail/detailView.dart';
 import 'package:flutter_template/detail/dateTimePickerTextField.dart';
 
 class LineDetailView extends StatefulWidget {
@@ -62,88 +62,19 @@ class _LineDetailViewState extends State<LineDetailView> {
         }
       case DateTime:
         {
-          return const DateTimePickerTextField();
+          return DateTimePickerTextField(
+            initialDateTime: DateTime.parse(
+                widget.controller?.text ?? "2000-01-01 01:01:01"),
+          );
+        }
+      case Array:
+        {
+          return const Padding(
+            padding: EdgeInsets.all(8.0),
+            child: Text("Hier kommt eine DetailView"),
+          );
         }
     }
     return Text('Unknown type: $type');
   }
 }
-
-/*
-    return Column(
-      children: [
-           switch (widget.type) {
-            case String:
-              TextField(
-                style: Theme.of(context).textTheme.titleLarge,
-                controller: widget.controller,
-                keyboardType: TextInput
-                decoration: InputDecoration(
-                labelStyle: Theme.of(context).textTheme.bodyLarge,
-                labelText: widget.name,
-                ),
-              );,
-              break;
-            case int:
-              TextField(
-                style: Theme.of(context).textTheme.titleLarge,
-                controller: widget.controller,
-                decoration: InputDecoration(
-                labelStyle: Theme.of(context).textTheme.bodyLarge,
-                labelText: widget.name,
-                ),
-              );,
-              break;
-
-      }
-      ],
-     
-    );
-
-
-
-
-
-
-
-
-       switch (type) {
-          case 'int': {
-            return TextField(
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                labelText: widget.name,
-                hintText: 'e.g. 42',
-              ),
-            );
-          } 
-          case 'double':
-            return TextField(
-              keyboardType: TextInputType.numberWithOptions(decimal: true),
-              decoration: InputDecoration(
-                labelText: widget.name,
-                hintText: 'e.g. 3.14',
-              ),
-            );
-          case 'string':
-            return TextField(
-              decoration: InputDecoration(
-                labelText: widget.name,
-                hintText: 'e.g. Hello World',
-              ),
-            );
-          case 'date':
-            return TextField(
-              keyboardType: TextInputType.datetime,
-              style: Theme.of(context).textTheme.titleLarge,
-              controller: widget.controller,
-              decoration: InputDecoration(
-              labelStyle: Theme.of(context).textTheme.bodyLarge,
-              labelText: widget.name,
-              hintText: 'e.g. MM/DD/YYYY',
-              ),
-            );
-          default:
-            return Text('Unknown type: $type');
-        }
-    */

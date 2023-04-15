@@ -79,4 +79,22 @@ class HttpHelper {
 
     return jsonDecode(res.body)["data"] as List;
   }
+
+  Future<void> updateCategory(String id, Map<String, dynamic> body) async {
+    Uri uri = Uri.https(authority, '/categories/$id');
+    print('Mein Body: ${jsonEncode(body)}');
+
+    final response = await http.put(
+      uri,
+      body: jsonEncode(body),
+    );
+
+    if (response.statusCode == 200) {
+      print('Response Body: ${response.body}');
+      print(response.statusCode);
+      print('Category updated successfully');
+    } else {
+      print('Failed to update category. Status code: ${response.statusCode}');
+    }
+  }
 }
