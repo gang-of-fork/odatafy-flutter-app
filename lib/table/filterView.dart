@@ -119,7 +119,7 @@ class _FilterViewState extends State<FilterView> {
                   child: TextField(
                     controller: filterController,
                     onChanged: ((value) {
-                      value.toString().length <= 1 ? setState(() {}) : "";
+                      setState(() {});
                     }),
                   ))
             ],

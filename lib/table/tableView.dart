@@ -206,10 +206,18 @@ class _TableViewState extends State<TableView> {
               );
             });
         for (var property in widget.tileDefinition.properties) {
+          var formats = [];
+          var types = [];
+          for (var typeClass in property.typesClass) {
+            formats.add(typeClass.format);
+            typeClass.types.forEach((value) {
+              types.add(value);
+            });
+          }
           var date = row[property.name];
-          if (property.types.first == "array") {
+          if (types.contains("array")) {
             dataRow.cells.add(convertListToDropDown(date, property.itemRef));
-          } else if (property.types.first == "date-time") {
+          } else if (formats.contains("date-time")) {
             dataRow.cells.add(convertDateToString(date));
           } else {
             dataRow.cells.add(DataCell(Container(
@@ -300,7 +308,7 @@ class _TableViewState extends State<TableView> {
   void navigateToRefTable(String ref, String id) {
     String tileName = ref.split("/").last;
     var refTile;
-    filter = [];
+    List<String> filterNavigation = [];
     var tileDefinition;
     for (var tileObj in widget.tiles) {
       if (tileObj["name"] == tileName) {
@@ -311,21 +319,17 @@ class _TableViewState extends State<TableView> {
       if (definition.name == tileName) {
         tileDefinition = definition;
         var property;
-        print(definition.properties.length);
         definition.properties.forEach((prop) {
-          print("test");
-          print(prop);
           if (prop.name == definition.keys.first) {
             property = prop;
           }
         });
         var formattedId = "'$id'";
-        print(property);
         if (property != null && property.pattern == "^[0-9a-fA-F]{24}\$") {
           formattedId = "cast('$id',ObjectId)";
         }
-        filter.add("${definition.keys.first} = ${formattedId}");
-        print(filter.first);
+        filterNavigation.add("${definition.keys.first} = ${formattedId}");
+        print(filterNavigation.first);
       }
     }
 
@@ -337,7 +341,7 @@ class _TableViewState extends State<TableView> {
               tileDefinition: tileDefinition,
               tileDefinitions: widget.tileDefinitions,
               tiles: widget.tiles,
-              filter: filter)),
+              filter: filterNavigation)),
     );
   }
 }
