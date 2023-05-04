@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
+import 'package:flutter_template/appBar.dart';
 
 import 'package:flutter_template/detail/lineDetailView.dart';
 import 'package:flutter_template/data/httpHelper.dart';
@@ -7,9 +8,16 @@ import 'package:flutter_template/data/httpHelper.dart';
 import '../data/property.dart';
 
 class DetailView extends StatefulWidget {
-  const DetailView({super.key, required this.data, required this.properties});
-  final data;
+  const DetailView(
+      {super.key,
+      required this.data,
+      required this.properties,
+      required this.tile,
+      required this.subSet});
+  final Map<String, dynamic> data;
   final List<Property> properties;
+  final tile;
+  final bool subSet;
 
   @override
   State<DetailView> createState() => _DetailViewState();
@@ -20,23 +28,20 @@ class _DetailViewState extends State<DetailView> {
   Map<dynamic, TextEditingController> controllers = {};
   List<String> keys = [];
   List<Property> propertiesList = [];
+  String tile = '';
   late Map<String, dynamic> valueMap = {};
   late Map<String, Type> typesMap = {};
   late Map<String, String> patternMap = {};
   late Map<String, int> maxLengthMap = {};
+  late Map<String, Property> propertyMap = {};
+  bool changed = false;
   bool fetching = true;
 
   @override
   void initState() {
+    tile = widget.tile['url'];
     valueMap = widget.data;
-    print(widget.data['products'].runtimeType);
     propertiesList = widget.properties;
-
-    print(valueMap['products'].runtimeType);
-    print(valueMap['products'][0]);
-
-    print(propertiesList[0].name);
-
     keys = valueMap.keys.toList();
 
     valueMap.forEach((key, value) {
@@ -44,6 +49,8 @@ class _DetailViewState extends State<DetailView> {
     });
 
     getPropertiesType(propertiesList);
+
+    createMaps(propertiesList);
 
     super.initState();
   }
@@ -53,6 +60,10 @@ class _DetailViewState extends State<DetailView> {
     return fetching
         ? const Center(child: CircularProgressIndicator())
         : Scaffold(
+            appBar: AppBarIcon(
+              actions: [],
+              withBackButton: false,
+            ),
             backgroundColor: Theme.of(context).backgroundColor,
             body: SingleChildScrollView(
               child: Padding(
@@ -71,10 +82,44 @@ class _DetailViewState extends State<DetailView> {
                         else
                           Column(
                             children: [
-                              LineDetailView(
-                                  controller: controllers[keys[i]],
-                                  name: keys[i],
-                                  type: typesMap[keys[i]]),
+                              Row(
+                                children: [
+                                  ConstrainedBox(
+                                    constraints: BoxConstraints(
+                                      maxWidth:
+                                          MediaQuery.of(context).size.width *
+                                              0.8,
+                                    ),
+                                    child: LineDetailView(
+                                      controller: controllers[keys[i]],
+                                      name: keys[i],
+                                      type: typesMap[keys[i]],
+                                      data: valueMap,
+                                      property: propertyMap[keys[i]],
+                                      id: valueMap['_id'],
+                                      tile: widget.tile,
+                                    ),
+                                  ),
+                                  ConstrainedBox(
+                                    constraints: BoxConstraints(
+                                      maxWidth:
+                                          MediaQuery.of(context).size.width *
+                                              0.05,
+                                    ),
+                                    child: Container(
+                                        child: propertyMap[keys[i]]?.ref != ""
+                                            ? IconButton(
+                                                icon: const Icon(Icons.link),
+                                                onPressed: () {
+                                                  print(
+                                                      'Hier ist ein REF: ${propertyMap[keys[i]]?.ref}');
+                                                  //navigateToRefTable(propertyMap[keys[i]]?.ref, date.toString());
+                                                },
+                                              )
+                                            : Container()),
+                                  )
+                                ],
+                              ),
                               const SizedBox(height: 16),
                             ],
                           ),
@@ -88,9 +133,23 @@ class _DetailViewState extends State<DetailView> {
                               child: ElevatedButton(
                                   onPressed: () {
                                     checkInputOfTextField(controllers, typesMap,
-                                        patternMap, maxLengthMap);
+                                        patternMap, maxLengthMap, valueMap);
                                   },
-                                  child: Text("Speichern")),
+                                  child: const Text("Speichern")),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(8.0, 20, 8.0, 0),
+                            child: SizedBox(
+                              width: 150,
+                              child: ElevatedButton(
+                                  onPressed: () {
+                                    Navigator.pop(context, changed);
+                                  },
+                                  child: const Text(
+                                    "Zurück zur Übersicht",
+                                    textAlign: TextAlign.center,
+                                  )),
                             ),
                           ),
                         ],
@@ -101,24 +160,25 @@ class _DetailViewState extends State<DetailView> {
           );
   }
 
+  //Create a map with data types of properties
   getPropertiesType(List<Property> propertiesList) {
     Map<String, Type> dataTypeMap = {};
-    List<Type> dataTypeList = [];
+
     propertiesList.forEach((property) {
       DataTypeEnum resultDataType = DataTypeEnum.noType;
-      property.typesClass.forEach((typesClass) {
+      property.typesClass!.forEach((typesClass) {
         resultDataType = getMoreRestrictiveType(
             resultDataType, transformFormatToDataType(typesClass.format));
       });
 
       if (resultDataType == DataTypeEnum.noType) {
-        property.typesClass.forEach((typesClass) {
+        property.typesClass!.forEach((typesClass) {
           resultDataType = getMoreRestrictiveType(
               resultDataType, transformTypesListToDataType(typesClass.types));
         });
       }
+
       dataTypeMap[property.name] = transformDataTypeToType(resultDataType);
-      dataTypeList.add(transformDataTypeToType(resultDataType));
     });
 
     setState(() {
@@ -127,6 +187,7 @@ class _DetailViewState extends State<DetailView> {
     });
   }
 
+  //Compare two types and return the more specific type (example: double > int)
   DataTypeEnum getMoreRestrictiveType(
       DataTypeEnum resultDataType, DataTypeEnum newDataType) {
     if (resultDataType.index < newDataType.index) {
@@ -135,6 +196,7 @@ class _DetailViewState extends State<DetailView> {
     return resultDataType;
   }
 
+  //take format and transform to a data type
   DataTypeEnum transformFormatToDataType(String format) {
     switch (format) {
       case 'date-time':
@@ -150,6 +212,7 @@ class _DetailViewState extends State<DetailView> {
     }
   }
 
+  //take the list of types and transform them to one type
   DataTypeEnum transformTypesListToDataType(List<dynamic> types) {
     DataTypeEnum localResultDataType = DataTypeEnum.noType;
     types.forEach((type) {
@@ -188,6 +251,8 @@ class _DetailViewState extends State<DetailView> {
     return localResultDataType;
   }
 
+  //First distinguish the data type of a property and save it as a DataTypeEnum, because DataTypeEnum has a ranking
+  //Now the DataTypeEnum needs to be transformed to a real data type
   Type transformDataTypeToType(DataTypeEnum dataType) {
     switch (dataType) {
       case DataTypeEnum.stringType:
@@ -208,99 +273,98 @@ class _DetailViewState extends State<DetailView> {
     }
   }
 
-  void showInSnackbar(BuildContext context, String value) {
-    // Shows a message to the user
-    ScaffoldMessenger.of(context).hideCurrentSnackBar();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        backgroundColor: Theme.of(context).primaryColorLight,
-        content: Text(value),
-      ),
-    );
-  }
-
+  //Create maps for the properties, the maximum length of each property and the pattern of each property
   createMaps(List<dynamic> propertiesList) {
+    //TODO: Implement pattern
     Map<String, String> localPatternMap = {};
     Map<String, int> localMaxLengthMap = {};
+    Map<String, Property> localPropertyMap = {};
     propertiesList.forEach((oneProperty) {
       localPatternMap[oneProperty.name] = oneProperty.pattern;
-      localMaxLengthMap[oneProperty.maxLength] = oneProperty.maxLength;
+      localMaxLengthMap[oneProperty.name] = oneProperty.maxLength ?? 0;
+      localPropertyMap[oneProperty.name] = oneProperty;
     });
     setState(() {
-      patternMap = localPatternMap;
+      propertyMap = localPropertyMap;
+      //patternMap = localPatternMap;
       maxLengthMap = localMaxLengthMap;
     });
   }
 
+  //check if there are any errors in the input fields (false type or longer then maximum length)
+  //if there is an error, than show a snackbar
   checkInputOfTextField(
       Map<dynamic, TextEditingController> controllers,
       Map<String, Type> typesMap,
       Map<String, String> patternMap,
-      Map<String, int> maxLengthMap) {
+      Map<String, int> maxLengthMap,
+      Map<String, dynamic> valueMap) {
     bool noProblems = true;
     String snackBarText = "";
     controllers.forEach((key, controller) {
-      switch (typesMap[key]) {
-        case int:
-          if (!isInputValidInt(controller.text, maxLengthMap[key])) {
-            if (maxLengthMap[key] != null) {
-              snackBarText =
-                  'In the field ${key} is an error. Input should be of type: ${typesMap[key]} and with a maximum length of ${maxLengthMap[key]}.';
-            } else {
-              snackBarText =
-                  'In the field ${key} is an error. Input should be of type: ${typesMap[key]}.';
+      if (valueMap[key].toString() != controller.text) {
+        switch (typesMap[key]) {
+          case int:
+            if (!isInputValidInt(controller.text, maxLengthMap[key])) {
+              if (maxLengthMap[key] != null && maxLengthMap[key]! > 0) {
+                snackBarText =
+                    'In the field ${key} is an error. Input should be of type: ${typesMap[key]} and with a maximum length of ${maxLengthMap[key]}.';
+              } else {
+                snackBarText =
+                    'In the field ${key} is an error. Input should be of type: ${typesMap[key]}.';
+              }
+              noProblems = false;
             }
-            noProblems = false;
-          }
-          break;
-        case double:
-          if (!isInputValidDouble(controller.text, maxLengthMap[key])) {
-            if (maxLengthMap[key] != null) {
-              snackBarText =
-                  'In the field ${key} is an error. Input should be of type: ${typesMap[key]} and with a maximum length of ${maxLengthMap[key]}.';
-            } else {
-              snackBarText =
-                  'In the field ${key} is an error. Input should be of type: ${typesMap[key]}.';
+            break;
+          case double:
+            if (!isInputValidDouble(controller.text, maxLengthMap[key])) {
+              if (maxLengthMap[key] != null && maxLengthMap[key]! > 0) {
+                snackBarText =
+                    'In the field ${key} is an error. Input should be of type: ${typesMap[key]} and with a maximum length of ${maxLengthMap[key]}.';
+              } else {
+                snackBarText =
+                    'In the field ${key} is an error. Input should be of type: ${typesMap[key]}.';
+              }
+              noProblems = false;
             }
-            noProblems = false;
-          }
-          break;
-        case String:
-          if (!isInputValidString(controller.text, maxLengthMap[key])) {
-            if (maxLengthMap[key] != null) {
-              snackBarText =
-                  'In the field ${key} is an error. Input should be of type: ${typesMap[key]} and with a maximum length of ${maxLengthMap[key]}.';
-            } else {
-              snackBarText =
-                  'In the field ${key} is an error. Input should be of type: ${typesMap[key]}.';
+            break;
+          case String:
+            if (!isInputValidString(controller.text, maxLengthMap[key])) {
+              if (maxLengthMap[key] != null && maxLengthMap[key]! > 0) {
+                snackBarText =
+                    'In the field ${key} is an error. Input should be of type: ${typesMap[key]} and with a maximum length of ${maxLengthMap[key]}.';
+              } else {
+                snackBarText =
+                    'In the field ${key} is an error. Input should be of type: ${typesMap[key]}.';
+              }
+              noProblems = false;
             }
-            noProblems = false;
-          }
-          break;
-        case DateTime:
-          if (!isInputValidDateTime(controller.text, maxLengthMap[key])) {
-            if (maxLengthMap[key] != null) {
-              snackBarText =
-                  'In the field ${key} is an error. Input should be of type: ${typesMap[key]} and with a maximum length of ${maxLengthMap[key]}.';
-            } else {
-              snackBarText =
-                  'In the field ${key} is an error. Input should be of type: ${typesMap[key]}.';
+            break;
+          case DateTime:
+            if (!isInputValidDateTime(controller.text, maxLengthMap[key])) {
+              if (maxLengthMap[key] != null && maxLengthMap[key]! > 0) {
+                snackBarText =
+                    'In the field ${key} is an error. Input should be of type: ${typesMap[key]} and with a maximum length of ${maxLengthMap[key]}.';
+              } else {
+                snackBarText =
+                    'In the field ${key} is an error. Input should be of type: ${typesMap[key]}.';
+              }
+              noProblems = false;
             }
-            noProblems = false;
-          }
-          break;
-        case bool:
-          if (!isInputValidBoolean(controller.text, maxLengthMap[key])) {
-            if (maxLengthMap[key] != null) {
-              snackBarText =
-                  'In the field ${key} is an error. Input should be of type: ${typesMap[key]} and with a maximum length of ${maxLengthMap[key]}.';
-            } else {
-              snackBarText =
-                  'In the field ${key} is an error. Input should be of type: ${typesMap[key]}.';
+            break;
+          case bool:
+            if (!isInputValidBoolean(controller.text, maxLengthMap[key])) {
+              if (maxLengthMap[key] != null && maxLengthMap[key]! > 0) {
+                snackBarText =
+                    'In the field ${key} is an error. Input should be of type: ${typesMap[key]} and with a maximum length of ${maxLengthMap[key]}.';
+              } else {
+                snackBarText =
+                    'In the field ${key} is an error. Input should be of type: ${typesMap[key]}.';
+              }
+              noProblems = false;
             }
-            noProblems = false;
-          }
-          break;
+            break;
+        }
       }
     });
     if (noProblems) {
@@ -310,27 +374,37 @@ class _DetailViewState extends State<DetailView> {
     }
   }
 
+  //Checking whether input is valid or not:
   bool isInputValidInt(String input, int? maxLength) {
-    if (maxLength != null && input.length > maxLength) {
-      return false;
+    if (maxLength != null && maxLength != 0) {
+      if (input.length > maxLength) {
+        return false;
+      }
     }
     return int.tryParse(input) != null;
   }
 
+  //Checking whether input is valid or not:
   bool isInputValidDouble(String input, int? maxLength) {
-    if (maxLength != null && input.length > maxLength) {
-      return false;
+    if (maxLength != null && maxLength != 0) {
+      if (input.length > maxLength) {
+        return false;
+      }
     }
     return double.tryParse(input) != null;
   }
 
+  //Checking whether input is valid or not:
   bool isInputValidString(String input, int? maxLength) {
-    return maxLength == null || input.length <= maxLength;
+    return maxLength == null || maxLength == 0 || input.length <= maxLength;
   }
 
+  //Checking whether input is valid or not:
   bool isInputValidDateTime(String input, int? maxLength) {
-    if (maxLength != null && input.length > maxLength) {
-      return false;
+    if (maxLength != null && maxLength != 0) {
+      if (input.length > maxLength) {
+        return false;
+      }
     }
     try {
       DateTime.parse(input);
@@ -340,12 +414,17 @@ class _DetailViewState extends State<DetailView> {
     }
   }
 
+  //Checking whether input is valid or not:
   bool isInputValidBoolean(String input, int? maxLength) {
-    return maxLength == null ||
-        input.length <= maxLength &&
-            (input.toLowerCase() == 'true' || input.toLowerCase() == 'false');
+    if (maxLength != null && maxLength != 0) {
+      if (input.length > maxLength) {
+        return false;
+      }
+    }
+    return input.toLowerCase() == 'true' || input.toLowerCase() == 'false';
   }
 
+  //Convert to type
   dynamic convertToType(Type? type, dynamic value) {
     switch (type) {
       case String:
@@ -358,12 +437,6 @@ class _DetailViewState extends State<DetailView> {
         return DateTime.parse(value.toString());
       case bool:
         return (value.toString().toLowerCase() == 'true');
-      case Array:
-        for (var item in value) {
-          print('Arrraaaaaaaayyyyy: ${item}');
-        }
-
-        return null;
       /*
         List<dynamic> convertedList = [];
         for (var item in value) {
@@ -375,17 +448,73 @@ class _DetailViewState extends State<DetailView> {
     }
   }
 
+  //send Data to backend
   sendData(Map<dynamic, TextEditingController> controllers) {
-    //TODO: Write method, that sends updated data to backend and gives message to user
     httpHelper = HttpHelper.HttpHelperWithoutAuthority();
-    valueMap.forEach((key, value) {
-      valueMap[key] = convertToType(typesMap[key], controllers[key]?.text);
-    });
+    Map<String, dynamic> newValueMap = {};
 
-    httpHelper.updateCategory(valueMap['_id'], valueMap);
+    newValueMap['_id'] = valueMap['_id'];
+    String tempId = valueMap["_id"];
+    valueMap.remove('_id');
+
+    if (widget.subSet) {
+      newValueMap[
+              deleteNumericIdentifierInArrayFieldNames(valueMap.keys.first)] =
+          valuesOfAnArrayInOneList(controllers);
+    } else {
+      valueMap.forEach((key, value) {
+        if (typesMap[key] != Array &&
+            valueMap[key].toString() != controllers[key]?.text) {
+          newValueMap[key] =
+              convertToType(typesMap[key], controllers[key]?.text);
+        }
+      });
+    }
+    Map<String, dynamic> tempValueMap = {};
+    tempValueMap['_id'] = tempId;
+
+    valueMap.forEach((key, value) {
+      tempValueMap[key] = value;
+    });
+    valueMap = tempValueMap;
+    changed = true;
+    httpHelper.updateCategory(tile, newValueMap['_id'], newValueMap);
+  }
+
+  //for arrays there is an numeric identifier added to the field name, which needs to be removed
+  String deleteNumericIdentifierInArrayFieldNames(String text) {
+    List<String> words = text.split(" ");
+    if (words.length > 1) {
+      words.removeLast();
+      text = words.join(" ");
+    }
+    return text;
+  }
+
+  //create a list for the array
+  List<dynamic> valuesOfAnArrayInOneList(
+      Map<dynamic, TextEditingController> controllers) {
+    List<dynamic> arrayEntries = [];
+    valueMap.forEach((key, value) {
+      arrayEntries.add(convertToType(typesMap[key], controllers[key]?.text));
+    });
+    return arrayEntries;
+  }
+
+  //show a text in the snackbar
+  void showInSnackbar(BuildContext context, String value) {
+    // Shows a message to the user
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        backgroundColor: Theme.of(context).primaryColorLight,
+        content: Text(value),
+      ),
+    );
   }
 }
 
+//a enum DataTypeEnum with all possible data types
 enum DataTypeEnum {
   noType,
   stringType,
@@ -397,3 +526,5 @@ enum DataTypeEnum {
 }
 
 class Array {}
+
+//Navigator.pop(changed)

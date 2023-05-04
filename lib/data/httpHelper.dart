@@ -109,12 +109,16 @@ class HttpHelper {
     return (jsonDecode(res.body)["data"] ?? []) as List;
   }
 
-  Future<void> updateCategory(String id, Map<String, dynamic> body) async {
-    Uri uri = Uri.https(authority, '/categories/$id');
+  Future<void> updateCategory(
+      String tile, String id, Map<String, dynamic> body) async {
+    String urlTile = tile.toLowerCase();
+    Uri uri = Uri.https(authority, '/$urlTile/$id');
+    final headers = {'Content-Type': 'application/json'};
     print('Mein Body: ${jsonEncode(body)}');
 
     final response = await http.put(
       uri,
+      headers: headers,
       body: jsonEncode(body),
     );
 

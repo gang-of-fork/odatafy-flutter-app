@@ -1,7 +1,7 @@
 import 'package:collection/collection.dart';
 
 class TypeFormat {
-  late List<dynamic> types;
+  late List<dynamic>? types;
   late String format;
   // List<String> failes at casting type but types is List<String>
 
@@ -13,7 +13,7 @@ class TypeFormat {
         ? types = importMap["type"]?.map((value) {
             return value.toString();
           }).toList()
-        : types.add(importMap["type"] ?? "");
+        : types?.add(importMap["type"] ?? "");
     format = importMap["format"]?.toString() ?? "";
   }
 

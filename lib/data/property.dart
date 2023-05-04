@@ -2,12 +2,13 @@ import 'package:flutter_template/data/type.dart';
 import 'package:flutter_template/data/typeArray.dart';
 
 class Property {
-  late String name, ref, pattern, itemRef;
-  late List<dynamic> typesClass;
+  late String name, pattern;
+  late String? ref, itemRef;
+  late List<dynamic>? typesClass;
   late List<dynamic> types;
-  late int maxLength;
-  late List<dynamic> itemTypes;
-  late TypeArray typeArray;
+  late int? maxLength;
+  late List<dynamic>? itemTypes;
+  TypeArray? typeArray;
   late List<dynamic> keys;
   // List<String> failes at casting type but types is List<String>
 
@@ -21,7 +22,7 @@ class Property {
         ? typesClass = importMap[name]["anyOf"]
             .map((value) => TypeFormat.fromJSON(value))
             .toList()
-        : typesClass.add(TypeFormat.fromJSON(importMap[name]));
+        : typesClass!.add(TypeFormat.fromJSON(importMap[name]));
     keys = importMap[name]["keys"] ?? [];
     types = importMap[name]["anyOf"]
             ?.map((value) {

@@ -59,6 +59,7 @@ class _DateTimePickerTextFieldState extends State<DateTimePickerTextField> {
         await _selectDate(context);
         await _selectTime(context);
       },
+      style: Theme.of(context).textTheme.titleLarge,
       controller: TextEditingController(
         text: selectedDate != null && selectedTime != null
             ? DateFormat.yMd().add_jm().format(DateTime(

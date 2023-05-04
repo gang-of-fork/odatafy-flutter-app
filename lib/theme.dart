@@ -78,19 +78,19 @@ ThemeData odatafyTheme() {
       labelLarge: TextStyle(
         fontSize: 14,
         fontFamily: 'Proxima Nova',
-        color: Colors.white,
+        color: Color.fromARGB(255, 148, 148, 148),
         letterSpacing: -0.5,
       ),
       labelMedium: TextStyle(
         fontSize: 12,
         fontFamily: 'Proxima Nova',
-        color: Colors.white,
+        color: Color.fromARGB(255, 148, 148, 148),
         letterSpacing: -0.5,
       ),
       labelSmall: TextStyle(
         fontSize: 11,
         fontFamily: 'Proxima Nova',
-        color: Colors.white,
+        color: Color.fromARGB(255, 148, 148, 148),
         letterSpacing: -0.5,
       ),
 

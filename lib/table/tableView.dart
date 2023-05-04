@@ -201,9 +201,18 @@ class _TableViewState extends State<TableView> {
                 context,
                 MaterialPageRoute(
                     builder: (BuildContext context) => DetailView(
-                        data: row,
-                        properties: widget.tileDefinition.properties)),
-              );
+                          data: row,
+                          properties: widget.tileDefinition.properties,
+                          tile: widget.tile,
+                          subSet: false,
+                        )),
+              ).then((value) {
+                if (value) {
+                  setState(() {
+                    getContent(0, '');
+                  });
+                }
+              });
             });
         for (var property in widget.tileDefinition.properties) {
           var date = row[property.name];
@@ -297,8 +306,8 @@ class _TableViewState extends State<TableView> {
     )));
   }
 
-  void navigateToRefTable(String ref, String id) {
-    String tileName = ref.split("/").last;
+  void navigateToRefTable(String? ref, String id) {
+    String tileName = ref!.split("/").last;
     var refTile;
     filter = [];
     var tileDefinition;
