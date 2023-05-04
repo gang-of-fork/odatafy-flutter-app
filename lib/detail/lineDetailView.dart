@@ -14,7 +14,9 @@ class LineDetailView extends StatefulWidget {
       required this.data,
       required this.property,
       required this.id,
-      required this.tile});
+      required this.tile,
+      required this.tiles,
+      required this.tileDefinitions});
 
   final TextEditingController? controller;
   final String name;
@@ -23,6 +25,8 @@ class LineDetailView extends StatefulWidget {
   final Property? property;
   final String id;
   final tile;
+  final tiles;
+  final tileDefinitions;
 
   @override
   State<LineDetailView> createState() => _LineDetailViewState();
@@ -184,6 +188,8 @@ class _LineDetailViewState extends State<LineDetailView> {
       properties: arrayProperties,
       tile: widget.tile,
       subSet: true,
+      tiles: widget.tiles,
+      tileDefinitions: widget.tileDefinitions,
     );
   }
 }

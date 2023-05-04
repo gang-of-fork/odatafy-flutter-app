@@ -203,6 +203,8 @@ class _TableViewState extends State<TableView> {
                     builder: (BuildContext context) => DetailView(
                           data: row,
                           properties: widget.tileDefinition.properties,
+                          tiles: widget.tiles,
+                          tileDefinitions: widget.tileDefinitions,
                           tile: widget.tile,
                           subSet: false,
                         )),
@@ -217,7 +219,7 @@ class _TableViewState extends State<TableView> {
         for (var property in widget.tileDefinition.properties) {
           var formats = [];
           var types = [];
-          for (var typeClass in property.typesClass) {
+          for (var typeClass in property.typesClass ?? []) {
             formats.add(typeClass.format);
             typeClass.types.forEach((value) {
               types.add(value);

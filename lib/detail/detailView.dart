@@ -6,6 +6,7 @@ import 'package:flutter_template/detail/lineDetailView.dart';
 import 'package:flutter_template/data/httpHelper.dart';
 
 import '../data/property.dart';
+import '../table/tableView.dart';
 
 class DetailView extends StatefulWidget {
   const DetailView(
@@ -13,11 +14,15 @@ class DetailView extends StatefulWidget {
       required this.data,
       required this.properties,
       required this.tile,
-      required this.subSet});
+      required this.subSet,
+      required this.tiles,
+      required this.tileDefinitions});
   final Map<String, dynamic> data;
   final List<Property> properties;
   final tile;
   final bool subSet;
+  final tiles;
+  final tileDefinitions;
 
   @override
   State<DetailView> createState() => _DetailViewState();
@@ -98,6 +103,8 @@ class _DetailViewState extends State<DetailView> {
                                       property: propertyMap[keys[i]],
                                       id: valueMap['_id'],
                                       tile: widget.tile,
+                                      tiles: widget.tiles,
+                                      tileDefinitions: widget.tileDefinitions,
                                     ),
                                   ),
                                   ConstrainedBox(
@@ -113,7 +120,10 @@ class _DetailViewState extends State<DetailView> {
                                                 onPressed: () {
                                                   print(
                                                       'Hier ist ein REF: ${propertyMap[keys[i]]?.ref}');
-                                                  //navigateToRefTable(propertyMap[keys[i]]?.ref, date.toString());
+                                                  navigateToRefTable(
+                                                      propertyMap[keys[i]]?.ref,
+                                                      valueMap[keys[i]]
+                                                          .toString());
                                                 },
                                               )
                                             : Container()),
@@ -510,6 +520,46 @@ class _DetailViewState extends State<DetailView> {
         backgroundColor: Theme.of(context).primaryColorLight,
         content: Text(value),
       ),
+    );
+  }
+
+  void navigateToRefTable(String? ref, String id) {
+    String tileName = ref!.split("/").last;
+    var refTile;
+    List<String> filterNavigation = [];
+    var tileDefinition;
+    for (var tileObj in widget.tiles) {
+      if (tileObj["name"] == tileName) {
+        refTile = tileObj;
+      }
+    }
+    for (var definition in widget.tileDefinitions) {
+      if (definition.name == tileName) {
+        tileDefinition = definition;
+        var property;
+        definition.properties.forEach((prop) {
+          if (prop.name == definition.keys.first) {
+            property = prop;
+          }
+        });
+        var formattedId = "'$id'";
+        if (property != null && property.pattern == "^[0-9a-fA-F]{24}\$") {
+          formattedId = "cast('$id',ObjectId)";
+        }
+        filterNavigation.add("${definition.keys.first} = ${formattedId}");
+        print(filterNavigation.first);
+      }
+    }
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (BuildContext context) => TableView(
+              tile: refTile,
+              tileDefinition: tileDefinition,
+              tileDefinitions: widget.tileDefinitions,
+              tiles: widget.tiles,
+              filter: filterNavigation)),
     );
   }
 }
