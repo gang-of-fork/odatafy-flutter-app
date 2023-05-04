@@ -17,7 +17,7 @@ class TableView extends StatefulWidget {
   TableView(
       {super.key,
       required this.tile,
-      this.filter = const [],
+      required this.filter,
       required this.tiles,
       required this.tileDefinition,
       required this.tileDefinitions});
@@ -44,7 +44,7 @@ class _TableViewState extends State<TableView> {
   List<List<DataRow>> listRows = [];
   List<DataRow> rows = [];
   List<String> dropdownValues = [];
-  List<String> filter = [];
+  late List<String> filter;
 
   late dynamic metadata;
 

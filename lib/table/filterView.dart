@@ -14,7 +14,7 @@ class FilterView extends StatefulWidget {
   FilterView(
       {super.key,
       required this.tile,
-      this.filter = const [],
+      required this.filter,
       required this.tileDefinition});
   final tile;
   final List<String> filter;

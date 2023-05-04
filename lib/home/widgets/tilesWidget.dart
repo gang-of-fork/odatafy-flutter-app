@@ -33,6 +33,7 @@ class _TilesWidgetState extends State<TilesWidget> {
                   tile: widget.tile,
                   tileDefinition: widget.tileDefinition,
                   tileDefinitions: widget.tileDefinitions,
+                  filter: [],
                   tiles: widget.tiles),
             ));
       },
